@@ -135,6 +135,7 @@ for c,cc in d.items():
 '''
 
 # ALBUM FUNCTION RETURNING DICTIONARY
+'''
 def album(name_artist, album_title, n_song=None):
     """Returns a dictionary with artist name, album title and eventually num songs"""
     if n_song:
@@ -157,4 +158,118 @@ while True:
         break
     a = album(name,title)
     print(a)
-    
+'''
+
+
+#PASS TO THE FUNCTION A LIST
+'''
+def greet_users(names):
+    """Print a simple greeting to each user in the list."""
+    for name in names:
+        msg = f"Hello, {name.title()}!"
+        print(msg)
+
+usernames = ['hannah', 'ty', 'margot']
+greet_users(usernames)    
+'''
+
+#MESSAGES
+'''
+def messages(text):
+    """Prints the messages in a list"""
+    for t in text:
+        print(t)
+        
+m = ['Hey','You','are','a','QT']
+messages(m)
+'''
+
+#SENDING MESSAGES
+'''
+def messages(send,sent):
+    """Prints the messages in a list"""
+    while send:
+        curr = send.pop()
+        sent.append(curr)
+        print(curr)
+    sent.reverse()
+
+        
+a = ['Hey','You','are','a','QT']
+b = []
+
+messages(a,b)
+print(a)
+print(b)
+
+messages(a[:],b)
+print(a)
+print(b)
+'''
+
+
+#Arbitrary number of arguments
+'''
+def make_pizza(*toppings):
+    """Summarize the pizza we are about to make."""
+    print("\nMaking a pizza with the following toppings:")
+    for topping in toppings:
+        print(f"- {topping}")
+
+make_pizza('pepperoni')
+make_pizza('mushrooms', 'green peppers', 'extra cheese')
+'''
+
+
+
+#SANDWICH
+'''
+def sandwiches(*toppings):
+    """Print the toppings of a sandwich"""
+    print('\nThe sandwich is made of:')
+    for t in toppings:
+        print(f'- {t}')
+        
+
+sandwiches('ham','cheese','salad')
+'''
+
+#Arbitrary key-word arguments
+'''
+def build_profile(first, last, **user_info):
+    """Build a dictionary containing everything we know about a user."""
+	  user_info['first_name'] = first
+    user_info['last_name'] = last
+    return user_info
+
+user_profile = build_profile('albert', 'einstein',
+                             location='princeton',
+                             field='physics')
+print(user_profile)
+'''
+
+#Cars
+
+def make_car(manufacturer, model_name, **args):
+    """Returns a dictionary of the info."""
+    args['manufacturer'] = manufacturer
+    args['model name'] = model_name
+    return args
+
+car = make_car('subaru', 'outback', color='blue', tow_package=True)
+print(car)
+
+
+
+#WORKING AND IMPORTING MODULE
+'''
+import module
+module.make_pizza('pepperoni')
+module.make_pizza('mushrooms', 'green peppers', 'extra cheese')
+'''
+
+#Importing a specific function
+'''
+from module import make_pizza
+make_pizza('mushrooms', 'green peppers', 'extra cheese')'''
+
