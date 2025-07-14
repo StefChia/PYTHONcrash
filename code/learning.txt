@@ -1,0 +1,4 @@
+In python I am learning about:
+-functions
+-classes
+-loops
