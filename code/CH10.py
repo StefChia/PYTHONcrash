@@ -301,4 +301,170 @@ else:
 
 
 
-#STORING DATA
+
+
+
+#STORING DATA using JSON format
+
+'''from pathlib import Path
+import json
+
+numbers = [2, 3, 5, 7, 11, 13]
+
+path = Path('numbers.json')
+contents = json.dumps(numbers)
+path.write_text(contents)'''
+
+
+#RETRIVING FROM JSON FORMAT
+
+'''from pathlib import Path
+import json
+path = Path('numbers.json')
+contents = path.read_text()
+numbers = json.loads(contents)
+
+print(numbers)
+'''
+
+#es
+'''
+from pathlib import Path
+import json
+
+path = Path('username.json')
+if path.exists():
+    contents = path.read_text()
+    username = json.loads(contents)
+    print(f"Welcome back, {username}!")
+else:
+    username = input("What is your name? ")
+    contents = json.dumps(username)
+    path.write_text(contents)
+    print(f"We'll remember you when you come back, {username}!")'''
+    
+
+
+
+#REFACTORING
+
+'''from pathlib import Path
+import json
+
+def get_stored_username(path):
+    """Get stored username if available."""
+    if path.exists():
+        contents = path.read_text()
+        username = json.loads(contents)
+        return username
+    else:
+         return None
+
+def get_new_username(path):
+    """Prompt for a new username."""
+    username = input("What is your name? ")
+    contents = json.dumps(username)
+    path.write_text(contents)
+    return username
+
+def greet_user():
+    """Greet the user by name."""
+    path = Path('username.json')
+    username = get_stored_username(path)
+    if username:
+        print(f"Welcome back, {username}!")
+    else:
+        username = get_new_username(path)
+        print(f"We'll remember you when you come back, {username}!")
+
+greet_user()'''
+
+
+
+#10.11-10.12 FAVORITE NUMBER
+
+'''from pathlib import Path
+import json
+path = Path('favorite_num.json')
+if path.exists():
+    content = path.read_text()
+    num = json.loads(content)
+    print(f'Your favorite number is {num}')
+else:
+    num = input('What is your favorite number? ')
+    content = json.dumps(num)
+    path.write_text(content)
+    print('We will remember next time.')'''
+
+
+
+#10.13 USER DICTIONARY ICE CREAMS
+
+'''from pathlib import Path
+import json
+
+path = Path('Cust_tastes.json')
+
+def check(path):
+    """Checks if a path exist and print the values. Otherwise ask for client taste."""
+    if path.exists():
+        content = path.read_text()
+        d = json.loads(content)
+        print(f'{path} is a valid path.\n')
+        for k,v in d.items():
+            print(f'\n{k.title()} favorite taste is {v}.')
+    else:
+        d = {}
+        while True:
+            name = input('Name of the customer: ')
+            taste = input('Fav taste of the customer: ')
+            contin = input('Add another? (yes/no)')
+            d[name.lower()] = taste.lower()
+            if contin.lower() == 'no':
+                break
+        content = json.dumps(d)
+        path.write_text(content)
+        
+check(path)      '''
+
+
+
+#10.14 VERIFY USER
+
+from pathlib import Path
+import json
+
+path = Path('usernames.json')
+
+def get_stored_username(path):
+    """Get stored username if available."""
+    if path.exists():
+        contents = path.read_text()
+        username = json.loads(contents)
+        return username
+    else:
+         return None
+
+def get_new_username(path):
+    """Prompt for a new username."""
+    username = input("What is your name? ")
+    contents = json.dumps(username)
+    path.write_text(contents)
+    return username
+
+def greetings(path):
+    """ """
+    username = get_stored_username(path)
+    if username:
+        check = input(f'Is {username} your username? (y/n)')
+        if check == 'yes':
+            print('It is allright!')
+        else:
+            new = get_new_username(path)
+            print(f'We have saved {new} as your username for next time.')
+    else:
+        user = get_new_username(path)
+        print(f'\nThanks to have registered. Your username is {user}.')
+
+
+greetings(path)
