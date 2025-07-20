@@ -143,6 +143,14 @@ class AlienInvasion:
             sleep(0.5)
         else:
             self.game_active = False
+            
+            # Get rid of any remaining bullets and aliens.
+            self.bullets.empty()
+            self.aliens.empty()
+            
+            # Get rid of any remaining bullets and aliens.
+            self.bullets.empty()
+            self.aliens.empty()
         
     
     def _update_bullets(self):
