@@ -15,16 +15,29 @@ class Settings:
         # Bullet settings
         self.bullet_width = 3
         self.bullet_height = 15
-        self.bullet_color = 60, 60, 60
-        self.bullets_allowed = 3
+        self.bullet_color = (60, 60, 60)
+        self.bullets_allowed = 30
 
         # Alien settings
         self.fleet_drop_speed = 10
 
         # How quickly the game speeds up
-        self.speedup_scale = 1.1
+        self.speedup_scale = 1.3
         # How quickly the alien point values increase
         self.score_scale = 1.5
+        
+        
+        #Spell settings
+        self.spell_width = 40
+        self.spell_height = 40
+        self.spell_speed = 2
+        self.spell_color = (0, 255, 0)
+        self.shield_color = (0, 0, 255)
+        
+        
+        #Shields setting 
+        self.shield_duration = 8000  # duration in milliseconds
+        self.shield_kill = 2
                 
         self.initialize_dynamic_settings()
         
@@ -32,7 +45,7 @@ class Settings:
     def initialize_dynamic_settings(self):
         """Initialize settings that change throughout the game."""
         self.ship_speed = 1.5
-        self.bullet_speed = 2.5
+        self.bullet_speed = 4
         self.alien_speed = 1.0
 
         # fleet_direction of 1 represents right; -1 represents left.

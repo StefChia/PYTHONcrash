@@ -3,6 +3,9 @@ import sys
 import pygame
 from random import randint
 from time import sleep
+from pathlib import Path
+import json
+
 
 from settings import Settings
 from ship import Ship
@@ -11,6 +14,7 @@ from alien import Alien
 from game_stats import GameStats
 from button import Button
 from scoreboard import Scoreboard
+from spell import Spell
 
 
 class AlienInvasion:
@@ -27,15 +31,27 @@ class AlienInvasion:
         self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption("Alien Invasion")
         
+        self.shield_status = False
+        self.shield_timer_start = None
+        
+        
         # Create an instance to store game statistics.
         self.stats = GameStats(self)
+        self.path = Path('/Users/stefanochiapparini/Desktop/PYTHON/PYTHONcrash/projects/alien_invasion2/storage.json')
+        self._load_record()
         self.sb = Scoreboard(self)
         
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
+        self.spells = pygame.sprite.Group()
+        
+        
+        
         
         self._create_fleet()
+        
+        
         
         # Start Alien Invasion in an active state.
         self.game_active = False
@@ -43,20 +59,48 @@ class AlienInvasion:
         # Make the Play button.
         self.play_button = Button(self, "Play")
 
+
+
     def run_game(self):
         """Start the main loop for the game."""
+        C = 0
         while True:
             self._check_events()
             
-            if self.game_active:                   
+            if self.game_active: 
+                C += 1
+                if C > randint(800,1600):
+                    self._spawn_spell()
+                    C = 0
+                                      
                 self.ship.update()
+                self._update_spells()
                 self._update_bullets()
                 self._update_aliens()
+                
                 
             self._update_screen()
             self.clock.tick(60)
 
 
+    
+    
+    
+    def _spawn_spell(self):
+        """Randomly spawn a spell"""
+        new_spell = Spell(self)
+        self.spells.add(new_spell)
+    
+    
+    def _load_record(self):
+        """Load the all time record stored or initiate one"""
+        if self.path.exists():
+            content = self.path.read_text()
+            try:
+                self.record_at = json.loads(content)
+            except json.JSONDecodeError:
+                self.record_at = 0     
+       
 
 
     def _check_events(self):
@@ -223,24 +267,46 @@ class AlienInvasion:
 
     def _ship_hit(self):
         """Respond to the ship being hit by an alien."""
-        if self.stats.ships_left > 0:
-            # Decrement ships_left.
-            self.stats.ships_left -= 1
-            self.sb.prep_ships()
+        if not self.shield_status:
+            if self.stats.ships_left > 0:
+                # Decrement ships_left.
+                self.stats.ships_left -= 1
+                self.sb.prep_ships()
 
-            # Get rid of any remaining bullets and aliens.
-            self.bullets.empty()
-            self.aliens.empty()
+                # Get rid of any remaining bullets and aliens.
+                self.bullets.empty()
+                self.aliens.empty()
 
-            # Create a new fleet and center the ship.
-            self._create_fleet()
-            self.ship.center_ship()
+                # Create a new fleet and center the ship.
+                self._create_fleet()
+                self.ship.center_ship()
 
-            # Pause.
-            sleep(0.5)
+                # Pause.
+                sleep(0.5)
+            else:
+                self.game_active = False
+                pygame.mouse.set_visible(True)
+                self._check_alltime_record()
+                self._load_record()
+        
         else:
-            self.game_active = False
-            pygame.mouse.set_visible(True)
+            collided_alien = pygame.sprite.spritecollideany(self.ship, self.aliens)
+            if collided_alien:
+                self.aliens.remove(collided_alien)
+                self.stats.score += self.settings.alien_points * self.settings.shield_kill
+                self.sb.prep_score()
+                self.sb.check_high_score()
+            
+            
+   
+                
+    def _check_alltime_record(self):
+        """Check the at record and update if it is rewrite"""
+        if self.stats.high_score > self.record_at:
+            self.record_at = self.stats.high_score
+            self.path.write_text(json.dumps(self.record_at))
+            self.sb.prep_alltime_record()
+
     
     def _check_aliens_bottom(self):
         """Check if any aliens have reached the bottom of the screen."""
@@ -262,19 +328,55 @@ class AlienInvasion:
         """Drop the entire fleet and change the fleet's direction."""
         for alien in self.aliens.sprites():
             alien.rect.y += self.settings.fleet_drop_speed
-        self.settings.fleet_direction *= -1        
+        self.settings.fleet_direction *= -1     
+        
+    def _update_spells(self):
+        """Update what is related to spells."""
+        self.spells.update()
+        
+        # Get rid of spells that have disappeared.
+        for spell in self.spells.copy():
+            if spell.rect.bottom >= self.screen.get_height():
+                 self.spells.remove(spell)
+        
+        self._check_spell_ship_collisions()
+        self._check_shield()  
+        
+    def _check_spell_ship_collisions(self):
+        """ Look for alien-ship collisions."""
+        collided_spell = pygame.sprite.spritecollideany(self.ship, self.spells)
+        if collided_spell:
+            self.shield_status = True  
+            self.shield_timer_start = pygame.time.get_ticks()
+            self.spells.remove(collided_spell)
+              
+    def _check_shield(self):
+        """Check if shield is still active"""
+        if self.shield_status:
+            current_time = pygame.time.get_ticks()
+            if current_time - self.shield_timer_start >= self.settings.shield_duration:
+                self.shield_status = False
+                self.shield_timer_start = None
+        
+        
+        
+        
+        
             
                 
     def _update_screen(self):
-        """“Update images on the screen, and flip to the new screen."""
+        """Update images on the screen, and flip to the new screen."""
         self.screen.fill(self.settings.bg_color)
-        self.ship.blitme()
+        self.ship.blitme(self)
         self.aliens.draw(self.screen)
         # Draw the score information.
         self.sb.show_score()
         
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
+            
+        for spell in self.spells.sprites():
+            spell.draw_spell()
             
         # Draw the play button if the game is inactive.
         if not self.game_active:

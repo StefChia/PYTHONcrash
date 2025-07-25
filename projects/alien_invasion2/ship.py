@@ -3,6 +3,7 @@ import pygame
 from pygame.sprite import Sprite
 
 
+
 class Ship(Sprite):
     """A class to manage the ship."""
 
@@ -48,8 +49,9 @@ class Ship(Sprite):
         self.rect.y = self.y
 
 
-    def blitme(self):
+    def blitme(self,ai_game):
         """Draw the ship at its current location."""
+        self._ship_shield(ai_game)
         self.screen.blit(self.image, self.rect)
     
     def center_ship(self):
@@ -60,3 +62,25 @@ class Ship(Sprite):
         self.rect.y = self.y
         self.x = float(self.rect.x)
         
+    def _ship_shield(self,ai_game):
+        """Generate shield on ship."""
+        if ai_game.shield_status == True:
+            self.draw_shield()
+        else: return None
+        
+    
+    def draw_shield(self):
+        """Draw the shield to the screen."""
+        
+        self.color = self.settings.shield_color
+        
+        # Create a shield rect at (0, 0) and then set correct position.
+        self.shield = pygame.Rect(0, 0, self.rect.width + 15,
+            self.rect.height + 15)
+        self.shield.center = self.rect.center
+        
+        # Store the position as a float.
+        self.y = float(self.rect.y)
+        
+        pygame.draw.ellipse(self.screen, self.color, self.shield, 3)
+        #pygame.draw.rect(self.screen, self.color, self.shield)

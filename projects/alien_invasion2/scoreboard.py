@@ -15,6 +15,7 @@ class Scoreboard:
         self.screen_rect = self.screen.get_rect()
         self.settings = ai_game.settings
         self.stats = ai_game.stats
+        self.record_at = ai_game.record_at
 
         # Font settings for scoring information.
         self.text_color = (30, 30, 30)
@@ -22,7 +23,7 @@ class Scoreboard:
 
         # Prepare the initial score image.
         self.prep_score()
-        self.prep_high_score()
+        self.prep_alltime_record()
         self.prep_level()
         self.prep_ships()
         
@@ -80,10 +81,22 @@ class Scoreboard:
             ship.rect.y = 10
             self.ships.add(ship)
             
+    def prep_alltime_record(self):
+        """Turn the high score into a rendered image."""
+        record = round(self.ai_game.record_at, -1)
+        record_str = f"{record:,}"
+        self.record_image = self.font.render(record_str, True,
+                self.text_color, self.settings.bg_color)
+
+        # Center the record score at the top of the screen.
+        self.record_rect = self.record_image.get_rect()
+        self.record_rect.centerx = self.screen_rect.centerx
+        self.record_rect.top = self.score_rect.top
+            
             
     def show_score(self):
         """Draw score to the screen."""
         self.screen.blit(self.score_image, self.score_rect)
-        self.screen.blit(self.high_score_image, self.high_score_rect)
+        self.screen.blit(self.record_image, self.record_rect)
         self.screen.blit(self.level_image, self.level_rect)
         self.ships.draw(self.screen)
